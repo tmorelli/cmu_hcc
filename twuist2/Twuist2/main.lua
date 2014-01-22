@@ -8,6 +8,9 @@ function handleAccelerometerChange(event)
 	tx.text = "x: "..event.xGravity;
 	ty.text = "y: "..event.yGravity;
 	tz.text = "z: "..event.zGravity;
+	if (event.yGravity <0) then
+		system.vibrate()
+	end
 
 end
 
