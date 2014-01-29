@@ -33,7 +33,7 @@ settings = {
 	-- Android permissions
 
 	androidPermissions = {
-  		"android.permission.VIBRATE
+  		"android.permission.VIBRATE"
    	},
 
 }
