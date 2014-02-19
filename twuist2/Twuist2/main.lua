@@ -24,6 +24,8 @@ function getLetter()
 	end
 end
 
+
+
 function incrementLetter()
 	letter = letter +1
 	if (letter > 4) then
@@ -33,7 +35,7 @@ end
 
 
 
-function handleAccelerometerChange(event)
+function handleTouch(event)
 	if (event.phase == "began") then
 		incrementLetter()
 	end
