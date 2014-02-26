@@ -5,6 +5,10 @@
 -----------------------------------------------------------------------------------------
 
 letter = 1
+numTouches = 0
+touchTimer = nil
+word = " "
+
 
 function getLetter()
 	if (letter == 1) then
@@ -34,11 +38,159 @@ function incrementLetter()
 end
 
 
-
-function handleTouch(event)
+function displayTouch(event)
 	if (event.phase == "began") then
 		incrementLetter()
 	end
+
+end
+
+function touchFinished()
+	print (numTouches)
+	touchTimer = nil
+--	orientation = getOrientation()
+	orientation = letter
+	nextLetter = getLetter(numTouches, orientation)
+	word = word .. nextLetter
+	txtWord.text = word
+	numTouches = 0
+	--word = " "
+	letter = letter + 1
+	if (letter > 7) then
+		letter = 0
+	end
+end
+
+
+function getLetter(numTouches, orientation)
+	if (orientation == 0) then
+		if (numTouches == 1) then
+			return "1"
+		elseif (numTouches == 2) then
+			return "2"
+		elseif (numTouches == 3) then
+			return "3"
+		elseif (numTouches == 4) then
+			return "4"
+		elseif (numTouches == 5) then
+			return "5"
+		elseif (numTouches == 6) then
+			return "6"
+		elseif (numTouches == 7) then
+			return "7"
+		elseif (numTouches == 8) then
+			return "8"
+		elseif (numTouches == 9) then
+			return "9"
+		elseif (numTouches == 10) then
+			return "0"
+		end
+	end
+	if (orientation == 1) then
+		if (numTouches == 1) then
+			return "A"
+		elseif (numTouches == 2) then
+			return "B"
+		elseif (numTouches == 3) then
+			return "C"
+		elseif (numTouches == 4) then
+			return "D"
+		end
+	end
+	if (orientation == 2) then
+		if (numTouches == 1) then
+			return "E"
+		elseif (numTouches == 2) then
+			return "F"
+		elseif (numTouches == 3) then
+			return "G"
+		elseif (numTouches == 4) then
+			return "H"
+		end
+	end
+	if (orientation == 3) then
+		if (numTouches == 1) then
+			return "I"
+		elseif (numTouches == 2) then
+			return "J"
+		elseif (numTouches == 3) then
+			return "K"
+		elseif (numTouches == 4) then
+			return "L"
+		end
+	end
+
+	if (orientation == 4) then
+		if (numTouches == 1) then
+			return "M"
+		elseif (numTouches == 2) then
+			return "N"
+		elseif (numTouches == 3) then
+			return "O"
+		elseif (numTouches == 4) then
+			return "P"
+		end
+	end
+
+	if (orientation == 5) then
+		if (numTouches == 1) then
+			return "Q"
+		elseif (numTouches == 2) then
+			return "R"
+		elseif (numTouches == 3) then
+			return "S"
+		elseif (numTouches == 4) then
+			return "T"
+		end
+	end
+
+	if (orientation == 6) then
+		if (numTouches == 1) then
+			return "U"
+		elseif (numTouches == 2) then
+			return "V"
+		elseif (numTouches == 3) then
+			return "W"
+		elseif (numTouches == 4) then
+			return "X"
+		end
+	end
+
+	if (orientation == 7) then
+		if (numTouches == 1) then
+			return "Y"
+		elseif (numTouches == 2) then
+			return "Z"
+		elseif (numTouches == 3) then
+			return "."
+		end
+	end
+
+	return "?"
+end
+
+
+
+
+function readMessage(event)
+	if (event.phase == "began") then
+		if (touchTimer ~= nil) then
+			timer.cancel(touchTimer)
+		end
+		numTouches = numTouches + 1
+		touchTimer = timer.performWithDelay(2000, touchFinished)		
+	end
+
+end
+
+function handleTouch(event)
+	if (displayingMessage) then
+		displayTouch(event)
+	else
+		readMessage(event)
+	end
+	
+
 end
 
 
@@ -124,7 +276,7 @@ end
 tx=display.newText("x",100,100);
 ty=display.newText("y",100,200);
 tz=display.newText("z",100,300);
-
+txtWord = display.newText(" ", 200,20)
 
 system.setAccelerometerInterval( 20 )
 Runtime:addEventListener( "accelerometer", handleAccelerometerChange )
