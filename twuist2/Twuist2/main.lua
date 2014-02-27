@@ -8,7 +8,13 @@ letter = 1
 numTouches = 0
 touchTimer = nil
 word = " "
+angle = {}
+angle.x = 0.0
+angle.y = 0.0
+angle.z = 0.0
 
+debounce = 0.2
+timeout = 1000
 
 function getLetter()
 	if (letter == 1) then
@@ -47,18 +53,73 @@ end
 
 function touchFinished()
 	print (numTouches)
+	tx.text = "x: "..angle.x
+	ty.text = "y: "..angle.y
+	tz.text = "z: "..angle.z
+
+
 	touchTimer = nil
---	orientation = getOrientation()
-	orientation = letter
+	orientation = getOrientation()
+--	orientation = letter
 	nextLetter = getLetter(numTouches, orientation)
 	word = word .. nextLetter
 	txtWord.text = word
 	numTouches = 0
 	--word = " "
-	letter = letter + 1
 	if (letter > 7) then
 		letter = 0
 	end
+end
+
+function getOrientation()
+	if ((angle.x > 0.018- debounce and angle.x < 0.018+debounce) and 
+		(angle.y > 1-debounce and angle.y < 1+debounce) and
+		(angle.z > 0.02-debounce and angle.z < 0.02+debounce)) then
+		return 0
+	end
+
+
+	if ((angle.x > 0.027-debounce and angle.x < 0.027+debounce) and 
+		(angle.y > 0.9-debounce and angle.y < 0.9+debounce) and
+		(angle.z > -.426-debounce and angle.z < -.426+debounce)) then
+		return 1
+	end
+
+	if ((angle.x > 0.038-debounce and angle.x < 0.038+debounce) and 
+		(angle.y > -0.012-debounce and angle.y < -0.012+debounce) and
+		(angle.z > -1-debounce and angle.z < -1+debounce)) then
+		return 2
+	end
+	if ((angle.x > 0.17-debounce and angle.x < 0.17+debounce) and 
+		(angle.y > -0.8286-debounce and angle.y < -0.8286+debounce) and
+		(angle.z > -.541-debounce and angle.z < -.541+debounce)) then
+		return 3
+	end
+
+	if ((angle.x > 0.1-debounce and angle.x < 0.1+debounce) and 
+		(angle.y > -1-debounce and angle.y < -1+debounce) and
+		(angle.z > 0.04-debounce and angle.z < 0.04+debounce) )then
+		return 4
+	end
+	if ((angle.x > 0.0561-debounce and angle.x < 0.0561+debounce) and 
+		(angle.y > -.75-debounce and angle.y < -.75+debounce) and
+		(angle.z > 0.654-debounce and angle.z < 0.654+debounce) )then
+		return 5
+		
+	end
+	if ((angle.x > 0.014-debounce and angle.x < 0.014+debounce) and 
+		(angle.y > -0.026-debounce and angle.y < -0.026+debounce) and
+		(angle.z > 1-debounce and angle.z < 1+debounce)) then
+		return 6
+	end
+	if ((angle.x > 0.1755-debounce and angle.x < 0.1755+debounce) and 
+		(angle.y > .8368-debounce and angle.y < .8368+debounce) and
+		(angle.z > .52-debounce and angle.z < .52+debounce)) then
+		return 7
+	end
+
+	return -1
+
 end
 
 
@@ -178,7 +239,7 @@ function readMessage(event)
 			timer.cancel(touchTimer)
 		end
 		numTouches = numTouches + 1
-		touchTimer = timer.performWithDelay(2000, touchFinished)		
+		touchTimer = timer.performWithDelay(timeout, touchFinished)		
 	end
 
 end
@@ -195,11 +256,13 @@ end
 
 
 function handleAccelerometerChange(event)
-	tx.text = "x: "..event.xGravity;
-	ty.text = "y: "..event.yGravity;
-	tz.text = "z: "..event.zGravity;
+--	tx.text = "x: "..event.xGravity;
+--	ty.text = "y: "..event.yGravity;
+--	tz.text = "z: "..event.zGravity;
 
-
+	angle.x = event.xGravity
+	angle.y = event.yGravity
+	angle.z = event.zGravity
 	
 --[[	
 	if ((event.xGravity > .0 and xGravity < .05) and
