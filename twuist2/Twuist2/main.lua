@@ -13,8 +13,28 @@ angle.x = 0.0
 angle.y = 0.0
 angle.z = 0.0
 
+target = {}
+target.x = 0.0
+target.y = 0.0
+target.z = 0.0
+
+
 debounce = 0.2
 timeout = 1000
+
+displayingMessage = true
+
+
+
+accels = {{0.018,1,0.02},
+		  {0.027,0.9,-.426},
+		  {0.038,-0.012,-1},
+		  {0.17,-0.8286,-.541},
+		  {0.1,-1,0.04},
+		  {0.0561,-.75,0.654},
+		  {0.014,-0.026,1},
+		  {0.1755,.8368,.52}}
+
 
 function getLetter()
 	if (letter == 1) then
@@ -48,7 +68,6 @@ function displayTouch(event)
 	if (event.phase == "began") then
 		incrementLetter()
 	end
-
 end
 
 function touchFinished()
@@ -72,56 +91,15 @@ function touchFinished()
 end
 
 function getOrientation()
-	if ((angle.x > 0.018- debounce and angle.x < 0.018+debounce) and 
-		(angle.y > 1-debounce and angle.y < 1+debounce) and
-		(angle.z > 0.02-debounce and angle.z < 0.02+debounce)) then
-		return 0
+	for x=1,8 do
+		if ((angle.x > accels[x][1]- debounce and angle.x < accels[x][1]+debounce) and 
+			(angle.y > accels[x][2]-debounce and angle.y < accels[x][2]+debounce) and
+			(angle.z > accels[x][3]-debounce and angle.z < accels[x][3]+debounce)) then
+			return x-1
+		end
 	end
-
-
-	if ((angle.x > 0.027-debounce and angle.x < 0.027+debounce) and 
-		(angle.y > 0.9-debounce and angle.y < 0.9+debounce) and
-		(angle.z > -.426-debounce and angle.z < -.426+debounce)) then
-		return 1
-	end
-
-	if ((angle.x > 0.038-debounce and angle.x < 0.038+debounce) and 
-		(angle.y > -0.012-debounce and angle.y < -0.012+debounce) and
-		(angle.z > -1-debounce and angle.z < -1+debounce)) then
-		return 2
-	end
-	if ((angle.x > 0.17-debounce and angle.x < 0.17+debounce) and 
-		(angle.y > -0.8286-debounce and angle.y < -0.8286+debounce) and
-		(angle.z > -.541-debounce and angle.z < -.541+debounce)) then
-		return 3
-	end
-
-	if ((angle.x > 0.1-debounce and angle.x < 0.1+debounce) and 
-		(angle.y > -1-debounce and angle.y < -1+debounce) and
-		(angle.z > 0.04-debounce and angle.z < 0.04+debounce) )then
-		return 4
-	end
-	if ((angle.x > 0.0561-debounce and angle.x < 0.0561+debounce) and 
-		(angle.y > -.75-debounce and angle.y < -.75+debounce) and
-		(angle.z > 0.654-debounce and angle.z < 0.654+debounce) )then
-		return 5
-		
-	end
-	if ((angle.x > 0.014-debounce and angle.x < 0.014+debounce) and 
-		(angle.y > -0.026-debounce and angle.y < -0.026+debounce) and
-		(angle.z > 1-debounce and angle.z < 1+debounce)) then
-		return 6
-	end
-	if ((angle.x > 0.1755-debounce and angle.x < 0.1755+debounce) and 
-		(angle.y > .8368-debounce and angle.y < .8368+debounce) and
-		(angle.z > .52-debounce and angle.z < .52+debounce)) then
-		return 7
-	end
-
 	return -1
-
 end
-
 
 function getLetter(numTouches, orientation)
 	if (orientation == 0) then
@@ -232,6 +210,18 @@ end
 
 
 
+function convertCharacterToOrientationAndIndex(char)
+	orientation = -1
+	index = -1
+	byte = string.byte(char) - 65  --A is at 65
+	index = byte % 4 
+	orientation = math.floor(byte / 4)
+	orientation = orientation + 1
+
+	return orientation,index
+
+end
+
 
 function readMessage(event)
 	if (event.phase == "began") then
@@ -251,6 +241,11 @@ function handleTouch(event)
 		readMessage(event)
 	end
 	
+
+end
+
+function getAccelValues(o)
+	return accels[o+1][1],accels[o+1][2],accels[o+1][3]
 
 end
 
@@ -344,5 +339,10 @@ txtWord = display.newText(" ", 200,20)
 system.setAccelerometerInterval( 20 )
 Runtime:addEventListener( "accelerometer", handleAccelerometerChange )
 Runtime:addEventListener("touch", handleTouch)
+
+orientation,index = convertCharacterToOrientationAndIndex("H")
+
+target.x,target.y,target.z = getAccelValues(orientation)
+
 
 -- Your code here
