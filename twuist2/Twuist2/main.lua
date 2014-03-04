@@ -5,8 +5,12 @@
 -----------------------------------------------------------------------------------------
 
 letter = 1
+debugPosition = 1
+
 numTouches = 0
 touchTimer = nil
+modeSwitchTimer = nil
+
 word = " "
 angle = {}
 angle.x = 0.0
@@ -19,9 +23,16 @@ target.y = 0.0
 target.z = 0.0
 
 
+message = "HELLO"
+
+
 debounce = 0.2
 timeout = 1000
 
+playingVibration = false
+pulsesRemaining = 0
+
+--When True This means vibrating to the user
 displayingMessage = true
 
 
@@ -58,15 +69,63 @@ end
 
 function incrementLetter()
 	letter = letter +1
-	if (letter > 4) then
+	if (letter > string.len(message)) then
 		letter = 1
 	end
+	targetCharacter = string.sub(message,letter,letter)
+	
+end
+
+function incrementDebugPosition()
+	debugPosition = debugPosition + 1
+	if (debugPosition > 8) then
+		debugPosition = 1
+	end
+end
+
+
+function clearVibrationFlag()
+	playingVibration = false
+end
+
+function pulseVibration()
+		system.vibrate()
+		pulsesRemaining = pulsesRemaining - 1
+		if (pulsesRemaining > 0) then
+			timer.performWithDelay(500,pulseVibration)
+		else
+			timer.performWithDelay(2000,clearVibrationFlag)
+		end
+end
+
+
+function playVibrationSequence(numPulses)
+	if (playingVibration == true) then
+		return;
+	else
+		pulsesRemaining = numPulses
+	end
+	
+	playingVibration = true
+
+	pulseVibration()
 end
 
 
 function displayTouch(event)
 	if (event.phase == "began") then
 		incrementLetter()
+		
+		targetCharacter = string.sub(message,letter,letter)
+		targetPosition,targetPulseLength = convertCharacterToOrientationAndIndex(targetCharacter)
+		targetPosition = targetPosition
+		targetPulseLength = targetPulseLength + 1
+
+		txtCharacter.text = targetCharacter
+		txtPosition.text = targetPosition+1
+		txtIndex.text = targetPulseLength
+
+--		playVibrationSequence(letter)
 	end
 end
 
@@ -234,7 +293,27 @@ function readMessage(event)
 
 end
 
+function switchModes()
+	if (displayingMessage == true) then
+		displayingMessage = false
+		txtMode.text = "touch"
+	else
+		displayingMessage = true
+		txtMode.text = "vibrate"
+	end
+	modeSwitchTimer = nil
+end
+
+
 function handleTouch(event)
+	if (event.phase == "began") then
+		modeSwitchTimer = timer.performWithDelay(5000, switchModes)
+	elseif (event.phase == "ended") then
+		if (modeSwitchTimer ~= nil) then
+			timer.cancel(modeSwitchTimer)
+		end
+	end
+
 	if (displayingMessage) then
 		displayTouch(event)
 	else
@@ -248,6 +327,15 @@ function getAccelValues(o)
 	return accels[o+1][1],accels[o+1][2],accels[o+1][3]
 
 end
+
+
+function orientationMatchesTarget()
+	if (getOrientation() == targetPosition) then
+		return true
+	end
+	return false
+end
+
 
 
 function handleAccelerometerChange(event)
@@ -329,6 +417,12 @@ function handleAccelerometerChange(event)
 		system.vibrate()
 	end
 --]]
+	if (displayingMessage) then
+		if (orientationMatchesTarget()) then
+			playVibrationSequence(targetPulseLength)
+		end
+	
+	end
 end
 
 tx=display.newText("x",100,100);
@@ -336,11 +430,27 @@ ty=display.newText("y",100,200);
 tz=display.newText("z",100,300);
 txtWord = display.newText(" ", 200,20)
 
+txtCharacter = display.newText("xxx", 200,100)
+txtPosition = display.newText("yyy",200,150)
+txtIndex = display.newText("zzz", 200,200)
+txtMode = display.newText("vibrate", 200,250)
+
+targetCharacter = string.sub(message,letter,letter)
+targetPosition,targetPulseLength = convertCharacterToOrientationAndIndex(targetCharacter)
+targetPosition = targetPosition 
+targetPulseLength = targetPulseLength + 1
+
+txtCharacter.text = targetCharacter
+txtPosition.text = targetPosition+1
+txtIndex.text = targetPulseLength
+
+
+
+
 system.setAccelerometerInterval( 20 )
 Runtime:addEventListener( "accelerometer", handleAccelerometerChange )
 Runtime:addEventListener("touch", handleTouch)
 
-orientation,index = convertCharacterToOrientationAndIndex("H")
 
 target.x,target.y,target.z = getAccelValues(orientation)
 
