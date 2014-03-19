@@ -1,6 +1,7 @@
 
 // Require a character controller to be attached to the same game object
 @script RequireComponent(CharacterController)
+import System.IO;
 
 public var idleAnimation : AnimationClip;
 public var walkAnimation : AnimationClip;
@@ -140,7 +141,24 @@ function UpdateSmoothedMovementDirection ()
 
 	var v = Input.GetAxisRaw("Vertical");
 	var h = Input.GetAxisRaw("Horizontal");
+	
+	try {
+        // Create an instance of StreamReader to read from a file.
+			sr = new StreamReader("runspeed.txt");
+        // Read and display lines from the file until the end of the file is reached.
+			v = parseFloat(sr.ReadLine())/10.0;
+			print(v);
+			sr.Close();
+	}
 
+	catch (e) {
+        // Let the user know what went wrong.
+			print("The file could not be read:");
+			print(e.Message);
+	}
+	
+	
+	
 	// Are we moving backwards or looking backwards
 	if (v < -0.2)
 		movingBack = true;

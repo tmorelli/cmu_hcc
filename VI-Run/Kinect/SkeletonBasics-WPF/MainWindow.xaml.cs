@@ -25,8 +25,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         float rightY = 0;
         long ticks = 0;
         Boolean waitingForUp = false;
-
-
+        string runspeedFilename = "Z:\\Documents\\windows\\cmu_hcc\\VI-Run\\VI-Run\\runspeed.txt";
+        float moveThreshold = 0.005f;
 
         private const float RenderWidth = 640.0f;
 
@@ -296,10 +296,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Render Joints
             foreach (Joint joint in skeleton.Joints)
             {
-                if (joint.JointType == JointType.HandRight)
+                if (joint.JointType == JointType.KneeRight)
                 {
                     float temp = joint.Position.Y;
-                    if (temp - rightY > 0.05)
+                    if (temp - rightY > moveThreshold)
                     {
                         if (waitingForUp == true)
                         {
@@ -308,6 +308,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             waitingForUp = false;
                             if (speed < 1000000)
                             {
+                              //  Console.WriteLine("10speed" + speed);
                                 speed = 10;
                             }
                             else if (speed < 1100000)
@@ -330,8 +331,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             {
                                 speed = 5;
                             }
+                            else if (speed < 1600000)
+                            {
+                                speed = 4;
+                            }
+                            else if (speed < 1700000)
+                            {
+                                speed = 3;
+                            }
+                            else if (speed < 1800000)
+                            {
+                                speed = 2;
+                            }
                             else
                             {
+
+
+                            //    Console.WriteLine("0speed" + speed);
+
                                 speed = 0;
                             }
 
@@ -339,20 +356,48 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
                             Console.WriteLine(speed);
+                            try
+                            {
+                                StreamWriter sw = new StreamWriter(runspeedFilename);
+                                sw.WriteLine(speed);
+                                sw.Close();
+                            }
+                            catch (Exception e)
+                            {
+
+                            }
                         }
+                        rightY = temp;
                         //Console.WriteLine("Moving Up" + (temp-rightY).ToString());
                     }
-                    else if (temp - rightY < -.05)
+                    else if (temp - rightY < -1.0f * moveThreshold)
                     {
                        // Console.WriteLine("Moving Down" + (temp - rightY).ToString());
                         waitingForUp = true;
                         ticks = DateTime.Now.Ticks;
+                        rightY = temp;
                     }
                     else
                     {
-                       // Console.WriteLine("Still");
+                        long newTicks = DateTime.Now.Ticks;
+                        long speed = newTicks - ticks;
+                        if (speed > 10000 * 2000)
+                        {
+                            speed = 0;
+                            //Console.WriteLine("Still" + speed);
+                            Console.WriteLine("0");
+                            try
+                            {
+                                StreamWriter sw = new StreamWriter(runspeedFilename);
+                                sw.WriteLine(speed);
+                                sw.Close();
+                            }
+                            catch (Exception e) { }
+
+                        }
+                        // Console.WriteLine("Still");
                     }
-                    rightY = temp;
+                    //rightY = temp;
                     //Console.WriteLine(joint.Position.X+","+joint.Position.Y+","+joint.Position.Z);
                 }
                 Brush drawBrush = null;

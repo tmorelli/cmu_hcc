@@ -9,6 +9,7 @@ public class SceneManager : MonoBehaviour {
 	public GameObject player1;
 	public GameObject player2;
 	public static float distance = 0.0f;
+	public static float playerSpeed = 0.0f;
 	// Use this for initialization
 	void Start () {
 	
@@ -24,5 +25,10 @@ public class SceneManager : MonoBehaviour {
 		StreamWriter sw = new StreamWriter("commands.txt");
         sw.WriteLine(rumbleVal);
 		sw.Close();
+		/*
+		StreamReader sr = new StreamReader("runspeed.txt");
+		playerSpeed = System.Convert.ToDouble(sr.ReadLine());
+		sr.Close();
+		*/
 	}
 }
