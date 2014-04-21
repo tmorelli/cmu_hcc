@@ -293,6 +293,7 @@ function readMessage(event)
 
 end
 
+
 function switchModes()
 	if (displayingMessage == true) then
 		displayingMessage = false
