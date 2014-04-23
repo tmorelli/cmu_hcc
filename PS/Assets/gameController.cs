@@ -56,7 +56,7 @@ public class gameController : MonoBehaviour
 				if (scoreText == null)
 						createScoreText ();
 				scoreText.text = "Score: " + ((int)(totalScore * 100)).ToString ();
-				Debug.Log (totalScore);
+				gc.gm.logEvent ("ScoreUpdate," + totalScore);
 				lastSelection = Time.time;
 
 				Debug.Log (shotsComplete);

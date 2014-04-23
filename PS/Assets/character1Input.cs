@@ -15,9 +15,9 @@ public class character1Input : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-//		if (touched == true){
-//			return;
-//		}
+		if (touched == true){
+			return;
+		}
 		if (gameController.useMouseButton() == true && Input.GetMouseButtonDown(0)){
 			SpriteRenderer sr = GetComponent<SpriteRenderer> ();
 			if (sr.sortingOrder<0){
@@ -44,7 +44,7 @@ public class character1Input : MonoBehaviour {
 				gameController.gc.gm.logEvent ("Notvalid,"+Time.time +","+Input.mousePosition.x+","+Input.mousePosition.y);
 			}
 		}
-		else if (gameController.useMouseButton() == false && Input.GetButtonDown("Jump")){
+		else if (gameController.useMouseButton() == false && Input.GetButtonDown("Fire1")){
 
 			SpriteRenderer sr = GetComponent<SpriteRenderer> ();
 			if (sr.sortingOrder<0){
@@ -76,6 +76,7 @@ public class character1Input : MonoBehaviour {
 	void DestroySelf(){
 		SpriteRenderer sr = GetComponent<SpriteRenderer> ();
 		sr.sortingOrder = -2;
+		touched = false;
 		
 //		Destroy (gameObject);
 	}
